@@ -1,0 +1,19 @@
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\bin\Debug\BrainF--- 2 Interpreter.exe.config
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\bin\Debug\BrainF--- 2 Interpreter.exe
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\bin\Debug\BrainF--- 2 Interpreter.pdb
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\BrainF--- 2 Interpreter.csprojAssemblyReference.cache
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\MainWindow.g.cs
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\App.g.cs
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\BrainF--- 2 Interpreter_MarkupCompile.cache
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\BrainF--- 2 Interpreter_MarkupCompile.lref
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\MainWindow.baml
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\BrainF--- 2 Interpreter.g.resources
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\BrainF____2_Interpreter.Properties.Resources.resources
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\BrainF--- 2 Interpreter.csproj.GenerateResource.cache
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\BrainF--- 2 Interpreter.csproj.CoreCompileInputs.cache
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\BrainF--- 2 Interpreter.exe
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\BrainF--- 2 Interpreter.pdb
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\bin\Debug\InterptreterAttempt.exe
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\bin\Debug\InterptreterAttempt.pdb
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\bin\Debug\InterptreterAttempt.exe.config
+C:\Users\ariga\source\repos\BrainF--- 2 Interpreter\BrainF--- 2 Interpreter\obj\Debug\BrainF--- 2 Interpreter.csproj.CopyComplete

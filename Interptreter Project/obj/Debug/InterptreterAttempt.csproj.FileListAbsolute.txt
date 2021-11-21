@@ -1,0 +1,7 @@
+C:\Users\ariga\source\repos\InterptreterAttempt\InterptreterAttempt\bin\Debug\InterptreterAttempt.exe.config
+C:\Users\ariga\source\repos\InterptreterAttempt\InterptreterAttempt\bin\Debug\InterptreterAttempt.exe
+C:\Users\ariga\source\repos\InterptreterAttempt\InterptreterAttempt\bin\Debug\InterptreterAttempt.pdb
+C:\Users\ariga\source\repos\InterptreterAttempt\InterptreterAttempt\obj\Debug\InterptreterAttempt.csprojAssemblyReference.cache
+C:\Users\ariga\source\repos\InterptreterAttempt\InterptreterAttempt\obj\Debug\InterptreterAttempt.csproj.CoreCompileInputs.cache
+C:\Users\ariga\source\repos\InterptreterAttempt\InterptreterAttempt\obj\Debug\InterptreterAttempt.exe
+C:\Users\ariga\source\repos\InterptreterAttempt\InterptreterAttempt\obj\Debug\InterptreterAttempt.pdb

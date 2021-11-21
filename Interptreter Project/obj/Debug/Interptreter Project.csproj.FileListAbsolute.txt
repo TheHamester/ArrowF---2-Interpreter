@@ -1,0 +1,7 @@
+C:\Users\ariga\source\repos\ArrowF--- 2 Interpreter\Interptreter Project\obj\Debug\Interptreter Project.csprojAssemblyReference.cache
+C:\Users\ariga\source\repos\ArrowF--- 2 Interpreter\Interptreter Project\obj\Debug\Interptreter Project.csproj.CoreCompileInputs.cache
+C:\Users\ariga\source\repos\ArrowF--- 2 Interpreter\Interptreter Project\bin\Debug\InterpreterProject.exe.config
+C:\Users\ariga\source\repos\ArrowF--- 2 Interpreter\Interptreter Project\bin\Debug\InterpreterProject.exe
+C:\Users\ariga\source\repos\ArrowF--- 2 Interpreter\Interptreter Project\bin\Debug\InterpreterProject.pdb
+C:\Users\ariga\source\repos\ArrowF--- 2 Interpreter\Interptreter Project\obj\Debug\InterpreterProject.exe
+C:\Users\ariga\source\repos\ArrowF--- 2 Interpreter\Interptreter Project\obj\Debug\InterpreterProject.pdb
