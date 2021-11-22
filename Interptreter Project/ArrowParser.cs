@@ -79,9 +79,9 @@ namespace InterpreterProject
 
         private IExprTree Factor()
         {
-            while (CurrentToken().Type == TokenType.Invert)
+            while (CurrentToken().Type == TokenType.Invert || CurrentToken().Type == TokenType.Not)
             {
-                Consume(TokenType.Invert);
+                Consume(CurrentToken().Type);
                 return new Unary(PreviousToken(), Factor());
             }
 
@@ -100,7 +100,6 @@ namespace InterpreterProject
                         Consume(TokenType.LeftBracket);
                         indexable = new Indexer(indexable, Expr());
                         Consume(TokenType.RightBracket);
-
                     }
                 return indexable;
             }
@@ -235,7 +234,6 @@ namespace InterpreterProject
             {
                 case TokenType.Assign:
                     Consume(TokenType.Assign);
-                    
                     expr = Expr();
                     if (expr == null) throw new Exception("Expected expression");
 

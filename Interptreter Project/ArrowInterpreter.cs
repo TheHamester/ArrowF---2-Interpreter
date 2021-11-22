@@ -16,7 +16,7 @@ namespace InterpreterProject
             new ArrowNote("LeftDown",  (ushort)(1<<4),  true),
             new ArrowNote("LeftUp",    (ushort)(1<<5),  true),
             new ArrowNote("DownRight", (ushort)(1<<6),  true),
-            new ArrowNote("UpRight",   (ushort)(1<<7),   true),
+            new ArrowNote("UpRight",   (ushort)(1<<7),  true),
             new ArrowNote("Mine",      (ushort)(1<<8),  true),
             new ArrowNote("Fake",      (ushort)(1<<9),  true),
             new ArrowNote("Hold",      (ushort)(1<<10), true),
@@ -91,17 +91,21 @@ namespace InterpreterProject
                 case TokenType.Invert:
                     if (right is ushort invert)
                         return (ushort)~invert;
-                    if (right is string)
-                        if (variables.Where(t => t.Id == (string)right).First() is ArrowNote note)
-                            return note.Value;
-
+                    if (right is List<object>)
+                    {
+                        ApplyUnaryOperationToArray<ushort>((List<object>)right, (o) => (ushort)(~o), unary.Token);
+                        return right;
+                    }
+                    
                     throw new OperationTypeMismatchException(right.GetType().ToString(), "", unary.Token.Text, false);
                 case TokenType.Not:
                     if (right is bool not)
                         return !not;
-                    if (right is string)
-                        if (variables.Where(t => t.Id == (string)right).First() is ArrowBoolean boolean)
-                            return boolean.Value;
+                    if (right is List<object>)
+                    {
+                        ApplyUnaryOperationToArray<bool>((List<object>)right, (o) => (!o), unary.Token);
+                        return right;
+                    }
                     throw new OperationTypeMismatchException(right.GetType().ToString(), "", unary.Token.Text, false);
                 default:
                     throw new Exception("wtf");
@@ -114,86 +118,237 @@ namespace InterpreterProject
             object right = Evaluate(binary.Right);
 
             object result;
+
+            ArrowType type = new ArrowType();
+            int topLayer = 0;
             switch (binary.Token.Type)
             { 
                 case TokenType.Plus:
-                    result = BinaryReturn<ushort, ArrowNote>(left, right, (l, r) => (ushort)(l + r));
+                    result = BinaryReturn<ushort, ushort>(left, right, (l, r) => (ushort)(l + r));
                     if (result != null) return (ushort)result;
+
+                    result = BinaryReturn<List<object>, List<object>>(left, right, (l, r) => l.Concat(r).ToList());
+                    if (result != null) return (List<object>)result;
                     break;
                 case TokenType.Minus:
-                    result = BinaryReturn<ushort, ArrowNote>(left, right, (l, r) => (ushort)(l - r));
+                    result = BinaryReturn<ushort, ushort>(left, right, (l, r) => (ushort)(l - r));
                     if (result != null) return (ushort)result;
+
+                    result = BinaryReturn<List<object>, List<object>>(left, right, (l, r)
+                           => { for (int i = r.Count-1; i >= 0; i--) { if(l.Remove(r[i])) r.Remove(r[i]); } return l.Count >= r.Count ? l.Concat(r).ToList() : r.Concat(l).ToList(); });
+                    if (result != null) return (List<object>)result;
+
+                    
+
                     break;
                 case TokenType.Times:
-                    result = BinaryReturn<ushort, ArrowNote>(left, right, (l, r) => (ushort)(l * r));
+                    result = BinaryReturn<ushort, ushort>(left, right, (l, r) => (ushort)(l * r));
                     if (result != null) return (ushort)result;
+
+                    result = BinaryReturn<List<object>, ushort>(left, right, (l, r) 
+                        => { List<object> list = new List<object>(l); List<object> res = new List<object>(); for (int i = 0; i < r; i++) res = res.Concat(list).ToList(); return res; });
+                    if (result != null) return (List<object>)result;
                     break;
                 case TokenType.Divide:
-                    result = BinaryReturn<ushort, ArrowNote>(left, right, (l, r) => (ushort)(l / r));
+                    result = BinaryReturn<ushort, ushort>(left, right, (l, r) => (ushort)(l / r));
                     if (result != null) return (ushort)result;
+
+                    result = BinaryReturn<List<object>, ushort>(left, right, (l, r)
+                        => { int n = l.Count / r; List<object> res = new List<object>();  for (int i = 0; i < n; i++) res.Add(l[i]); return res; });
+                    if (result != null) return (List<object>)result;
                     break;
                 case TokenType.Modulo:
-                    result = BinaryReturn<ushort, ArrowNote>(left, right, (l, r) => (ushort)(l % r));
+                    result = BinaryReturn<ushort, ushort>(left, right, (l, r) => (ushort)(l % r));
                     if (result != null) return (ushort)result;
                     break;
                 case TokenType.And:
-                    result = BinaryReturn<ushort, ArrowNote>(left, right, (l, r) => (ushort)(l & r));
+                    result = BinaryReturn<ushort, ushort>(left, right, (l, r) => (ushort)(l & r));
                     if (result != null) return (ushort)result;
 
-                    result = BinaryReturn<bool, ArrowBoolean>(left, right, (l, r) => l && r);
+                    result = BinaryReturn<bool, bool>(left, right, (l, r) => l && r);
                     if (result != null) return (bool)result;
+
+                    result = TryApplyArrayToArrayOperation(left, right, (l, r) => (ushort)(l & r), (l, r) => l && r);
+                    if (result != null) return (List<object>)result;
                     break;
                 case TokenType.Xor:
-                    result = BinaryReturn<ushort, ArrowNote>(left, right, (l, r) => (ushort)(l ^ r));
+                    result = BinaryReturn<ushort, ushort>(left, right, (l, r) => (ushort)(l ^ r));
                     if (result != null) return (ushort)result;
 
-                    result = BinaryReturn<bool, ArrowBoolean>(left, right, (l, r) => l ^ r);
+                    result = BinaryReturn<bool, bool>(left, right, (l, r) => l ^ r);
                     if (result != null) return (bool)result;
+
+                    result = TryApplyArrayToArrayOperation(left, right, (l, r) => (ushort)(l ^ r), (l, r) => l ^ r);
+                    if (result != null) return (List<object>)result;
                     break;
                 case TokenType.Or:
-                    result = BinaryReturn<ushort, ArrowNote>(left, right, (l, r) => (ushort)(l | r));
+                    result = BinaryReturn<ushort, ushort>(left, right, (l, r) => (ushort)(l | r));
                     if (result != null) return (ushort)result;
 
-                    result = BinaryReturn<bool, ArrowBoolean>(left, right, (l, r) => l || r);
+                    result = BinaryReturn<bool, bool>(left, right, (l, r) => l || r);
                     if (result != null) return (bool)result;
+
+                    result = TryApplyArrayToArrayOperation(left, right, (l, r) => (ushort)(l | r), (l, r) => l || r);
+                    if (result != null) return (List<object>)result;
                     break;
                 case TokenType.LeftShift:
-                    result = BinaryReturn<ushort, ArrowNote>(left, right, (l, r) => (ushort)(l << r));
+                    result = BinaryReturn<ushort, ushort>(left, right, (l, r) => (ushort)(l << r));
                     if (result != null)  return (ushort)result;
+
+                    if (left is List<object> && right is ushort)
+                    {
+
+                        topLayer = GetDepthAndTypeList((List<object>)left, ref type);
+                        MatchesTypeAndDepth((List<object>)left, type, topLayer);
+
+                        ((List<object>)left).RemoveRange(0, (ushort)right);
+
+                        return left;
+                    }
+
                     break;
                 case TokenType.RightShift:
-                    result = BinaryReturn<ushort, ArrowNote>(left, right, (l, r) => (ushort)(l >> r));
+                    result = BinaryReturn<ushort, ushort>(left, right, (l, r) => (ushort)(l >> r));
                     if (result != null) return (ushort)result;
+
+                    if (left is List<object> && right is ushort)
+                    {
+
+                        topLayer = GetDepthAndTypeList((List<object>)left, ref type);
+                        MatchesTypeAndDepth((List<object>)left, type, topLayer);
+
+                        ((List<object>)left).RemoveRange(((List<object>)left).Count - (ushort)right, (ushort)right);
+
+                        return left;
+                    }
+
                     break;
             }
+
             throw new OperationTypeMismatchException(left.GetType().ToString(), right.GetType().ToString(), binary.Token.Text, true);
         }
 
-        public object BinaryReturn<T, U>(object left, object right, Func<T,T,T> f) where U : ArrowType
+        private object BinaryReturn<T,U>(object left, object right, Func<T,U,T> f)
         {
-            if (left is T plusL && right is T plusR)
-                return f(plusL, plusR);
-            if (left is string && right is string)
+            int topLayer = 0;
+            ArrowType type = new ArrowType();
+            if (left is T plusL1 && right is U plusR1)
             {
-                ArrowType t1 = variables.First(t => t.Id == (string)left);
-                ArrowType t2 = variables.First(t => t.Id == (string)right);
-                if (t1 is U && t2 is U)
-                    return f((T)((U)t1).Value, (T)((U)t2).Value);
+                if (left is List<object>)
+                {
+                    topLayer = GetDepthAndTypeList((List<object>)left, ref type);
+                    MatchesTypeAndDepth((List<object>)left, type, topLayer);
+                }
+                return f(plusL1, plusR1);
             }
-            if (left is string && right is T)
+            if (left is U plusL2 && right is T plusR2)
             {
-                ArrowType t1 = variables.First(t => t.Id == (string)left);
-                if (t1 is U)
-                    return f((T)((U)t1).Value, (T)right);
-            }
-            if (left is T && right is string)
-            {
-                ArrowType t1 = variables.First(t => t.Id == (string)right);
-                if (t1 is U)
-                    return f((T)left, (T)((U)t1).Value);
+                if (right is List<object>)
+                {
+                    topLayer = GetDepthAndTypeList((List<object>)left, ref type);
+                    MatchesTypeAndDepth((List<object>)left, type, topLayer);
+                }
+                return f(plusR2, plusL2);
             }
             return null;
         }
+
+        private void ApplyUnaryOperationToArray<T>(List<object> list, Func<T,T> func, Token token)
+        {
+            for(int i = 0; i < list.Count; i++)
+            {
+                if (list[i] is List<object>)
+                    ApplyUnaryOperationToArray((List<object>)list[i], func, token);
+                else
+                {
+                    if (list[i] is T)
+                        list[i] = func((T)list[i]);
+                    else
+                        throw new OperationTypeMismatchException(list[i].GetType().ToString(), "", token.Text, false);
+                }
+
+            }
+        }
+
+        private List<object> TryApplyArrayToArrayOperation(object left, object right, Func<ushort, ushort, ushort> f1, Func<bool, bool, bool> f2)
+        {
+            int topLayer = 0;
+            ArrowType type = new ArrowType();
+            if (left is List<object> && right is List<object>)
+            {
+                topLayer = GetDepthAndTypeList((List<object>)left, ref type);
+                MatchesTypeAndDepth((List<object>)left, type, topLayer);
+                MatchesTypeAndDepth((List<object>)right, type, topLayer);
+                if (type is ArrowNote)
+                    ApplyArrayToArrayOperation((List<object>)left, (List<object>)right, f1);
+                else if (type is ArrowBoolean)
+                    ApplyArrayToArrayOperation((List<object>)left, (List<object>)right, f2);
+                return (List<object>)left;
+            }
+            return null;
+        }
+
+        private void ApplyArrayToArrayOperation<T>(List<object> l1, List<object> l2, Func<T, T, T> func)
+        {
+            int i = 0;
+            while (i < l1.Count && i < l2.Count)
+            {
+                if ((l1[i] is List<object> l1i) && (l2[i] is List<object> l2i))
+                {
+
+                    ApplyArrayToArrayOperation(l1i, l2i, func);
+
+
+                }
+                else
+                {
+                    if (l1[i] is T && l2[i] is T)
+                        l1[i] = func((T)l1[i], (T)l2[i]);
+                    else
+                        throw new Exception("unmatched types");
+                }
+                i++;
+            }
+
+            if (i < l1.Count)
+                SetElementsToZero(l1, i);
+
+            if (i < l2.Count)
+                AddZeros(l1,l2, i);
+                
+        }
+
+        private void SetElementsToZero(List<object> list, int starts)
+        {
+            for (int i = starts; i < list.Count; i++)
+            {
+                if (list[i] is List<object>)
+                    SetElementsToZero((List<object>)list[i], 0);
+                else if (list[i] is ushort)
+                    list[i] = (ushort)0;
+                else if (list[i] is bool)
+                    list[i] = false;
+            }
+        }
+
+        private void AddZeros(List<object> l1, List<object> l2, int starts)
+        {
+            List<object> l = new List<object>();
+            for (int i = starts; i < l2.Count; i++)
+            {
+                if (l2[i] is List<object>)
+                {
+                    l = new List<object>();
+                    AddZeros(l, (List<object>)l2[i], 0);
+                    l1.Add(l);
+                }
+                else if (l2[i] is ushort)
+                    l1.Add((ushort)0);
+                else if (l2[i] is bool)
+                    l1.Add(false);
+            }
+        }
+
 
         public object Visit(Assignment assignment)
         {
@@ -222,7 +377,6 @@ namespace InterpreterProject
                 variables[variables.Count() - 1].Value = (List<object>)result;
                 ArrowType t = new ArrowType();
                 int topLayer = GetDepthAndType((ArrowArray)variables[variables.Count() - 1], ref t);
-
                 MatchesTypeAndDepth((List<object>)variables[variables.Count() - 1].Value, t, topLayer);
             }
             else
@@ -356,6 +510,31 @@ namespace InterpreterProject
                 type = arrowArray.Type;
                 return 1;
             }
+        }
+
+        private int GetDepthAndTypeList(List<object> list, ref ArrowType type)
+        {
+            if (list.Count != 0)
+            {
+                if (list[0] is List<object>)
+                    return 1 + GetDepthAndTypeList((List<object>)list[0], ref type);
+                else
+                    foreach (object o in list)
+                    {
+                        if (o is ushort)
+                        {
+                            type = new ArrowNote("", 0, false);
+                            return 1;
+                        }
+                        else if (o is bool)
+                        {
+                            type = new ArrowBoolean("", false, false);
+                            return 1;
+                        }
+                    }
+            }
+            type = null;
+            return 1;
         }
 
         private void MatchesTypeAndDepth(List<object> value, ArrowType type, int layer)
