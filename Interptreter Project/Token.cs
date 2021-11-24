@@ -53,24 +53,11 @@ namespace InterpreterProject
         EOF
     };
 
-    public class Token
+    public record Token(TokenType Type, string Text, int Line) 
     {
-        public TokenType Type { get; set; }
-
-        public string Text { get; set; }
-
-        public int StartPos { get; set; }
-
-        public Token(TokenType type, string text, int startPos)
-        {
-            Type = type;
-            Text = text;
-            StartPos = startPos;
-        }
-
         public override string ToString()
         {
-            return $"{Type.ToString()}: {Text} {StartPos}";
+            return $"{Type}: {Text} on line {Line}";
         }
     }
 }

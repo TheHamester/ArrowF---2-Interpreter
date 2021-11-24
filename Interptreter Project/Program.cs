@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using InterpreterProject.Expressions;
+using InterpreterProject.ArrowExpressions;
 
 namespace InterpreterProject
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             string program = "";
             List<string> lines = File.ReadAllLines("input.txt").ToList();
@@ -16,16 +16,16 @@ namespace InterpreterProject
             foreach (string str in lines)
                 program += str + "\n";
 
-            ArrowLexer lexer = new ArrowLexer(program);
+            ArrowLexer lexer = new(program);
             
             List<Token> tokens = lexer.CollectTokens();
 
             Console.WriteLine(lexer.Input);
-            ArrowParser p = new ArrowParser(tokens);
+            ArrowParser p = new(tokens);
             IExprTree tree = p.Parse();
 
 
-            ArrowInterpreter ai = new ArrowInterpreter();
+            ArrowInterpreter ai = new();
             ai.Interpret(tree);
 
         }

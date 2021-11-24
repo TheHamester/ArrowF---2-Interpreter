@@ -2,17 +2,18 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-	<LangVersion>preview</LangVersion>
+    <LangVersion>preview</LangVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{8F41B909-2D4A-4DFC-91E3-E2F48470C2DB}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>InterpreterProject</RootNamespace>
     <AssemblyName>InterpreterProject</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -44,30 +45,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrowExceptions\ArrowException.cs" />
+    <Compile Include="ArrowExceptions\AssignmentTypeMismatchException.cs" />
+    <Compile Include="ArrowExceptions\ExpectedExpressionException.cs" />
+    <Compile Include="ArrowExceptions\InvalidIndexException.cs" />
+    <Compile Include="ArrowExceptions\UnableToModifyAConstantVariableException.cs" />
+    <Compile Include="ArrowExceptions\UnexpectedTokenException.cs" />
+    <Compile Include="ArrowExceptions\UnindexableTypeException.cs" />
+    <Compile Include="ArrowExceptions\UninitiallizedVariableException.cs" />
+    <Compile Include="ArrowExceptions\UnmatchedArrayDepthException.cs" />
+    <Compile Include="ArrowExceptions\UnmatchedArrayTypeException.cs" />
+    <Compile Include="ArrowExceptions\UnmatchedBracketsException.cs" />
+    <Compile Include="ArrowExceptions\VariableReferencedBeforeAssignmentException.cs" />
     <Compile Include="ArrowInterpreter.cs" />
     <Compile Include="ArrowParser.cs" />
-    <Compile Include="Expressions\ArrayExpression.cs" />
-    <Compile Include="Expressions\ArrowApplication.cs" />
-    <Compile Include="Expressions\ArrowArray.cs" />
-    <Compile Include="Expressions\ArrowBoolean.cs" />
-    <Compile Include="Expressions\ArrowFunction.cs" />
-    <Compile Include="Expressions\ArrowNote.cs" />
-    <Compile Include="Expressions\ArrowType.cs" />
-    <Compile Include="Expressions\Assignment.cs" />
-    <Compile Include="Expressions\Binary.cs" />
-    <Compile Include="Expressions\Grouping.cs" />
-    <Compile Include="Expressions\IExprTree.cs" />
-    <Compile Include="Expressions\IExprVisitor.cs" />
-    <Compile Include="Expressions\Indexer.cs" />
-    <Compile Include="Expressions\Literal.cs" />
-    <Compile Include="Expressions\Reassignment.cs" />
-    <Compile Include="Expressions\Statement.cs" />
-    <Compile Include="Expressions\Unary.cs" />
-    <Compile Include="OperationTypeMismatchException.cs" />
+    <Compile Include="ArrowExpressions\ArrayExpression.cs" />
+    <Compile Include="ArrowExpressions\ArrowApplication.cs" />
+    <Compile Include="ArrowTypes\ArrowArray.cs" />
+    <Compile Include="ArrowTypes\ArrowBoolean.cs" />
+    <Compile Include="ArrowTypes\ArrowFunction.cs" />
+    <Compile Include="ArrowTypes\ArrowNote.cs" />
+    <Compile Include="ArrowTypes\ArrowType.cs" />
+    <Compile Include="ArrowExpressions\Assignment.cs" />
+    <Compile Include="ArrowExpressions\Binary.cs" />
+    <Compile Include="ArrowExpressions\Grouping.cs" />
+    <Compile Include="ArrowExpressions\IExprTree.cs" />
+    <Compile Include="ArrowExpressions\IExprVisitor.cs" />
+    <Compile Include="ArrowExpressions\Indexer.cs" />
+    <Compile Include="ArrowExpressions\Literal.cs" />
+    <Compile Include="ArrowExpressions\Reassignment.cs" />
+    <Compile Include="ArrowExpressions\Unary.cs" />
+    <Compile Include="ArrowExceptions\OperationTypeMismatchException.cs" />
     <Compile Include="ArrowLexer.cs" />
+    <Compile Include="IsExternalInit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SymbolNotRecognisedException.cs" />
+    <Compile Include="ArrowExceptions\SymbolNotRecognisedException.cs" />
     <Compile Include="Token.cs" />
   </ItemGroup>
   <ItemGroup>

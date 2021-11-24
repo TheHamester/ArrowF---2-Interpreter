@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace InterpreterProject.Expressions
+namespace InterpreterProject.ArrowTypes
 {
     public class ArrowArray : ArrowType
     {

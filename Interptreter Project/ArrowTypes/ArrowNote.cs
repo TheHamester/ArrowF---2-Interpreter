@@ -1,5 +1,5 @@
 ﻿
-namespace InterpreterProject.Expressions
+namespace InterpreterProject.ArrowTypes
 {
     public class ArrowNote : ArrowType
     {

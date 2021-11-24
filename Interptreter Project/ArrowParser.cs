@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InterpreterProject.Expressions;
-
+using InterpreterProject.ArrowExpressions;
+using InterpreterProject.ArrowTypes;
+using InterpreterProject.ArrowExceptions;
 
 namespace InterpreterProject
 {
-
     public class ArrowParser
     {
-        private List<Token> tokens = new List<Token>();
+        private readonly List<Token> tokens = new();
         private int currentPos;
 
         public ArrowParser(List<Token> tokens) { this.tokens = tokens; }
@@ -25,16 +25,21 @@ namespace InterpreterProject
         public void Consume(TokenType type)
         {
             if (CurrentToken().Type != type)
-                throw new Exception($"{CurrentToken().Type} but expected {type}");
+                throw new UnexpectedTokenException(CurrentToken().Type, type, CurrentToken().Line);
 
             currentPos++;
         }
 
         private IExprTree ArrowAppllication()
         {
-            List<IExprTree> statements = new List<IExprTree>();
+            List<IExprTree> statements = new();
             while (CurrentToken().Type != TokenType.EOF)
             {
+                if (CurrentToken().Type == TokenType.EOL || CurrentToken().Type == TokenType.Comment)
+                {
+                    Consume(TokenType.EOL);
+                    continue;
+                }
                 statements.Add(Statement());
                 if(CurrentToken().Type != TokenType.EOF)
                     Consume(TokenType.EOL);
@@ -47,7 +52,7 @@ namespace InterpreterProject
             bool assignTokens = ContainsAssignTokens();
             bool typeTokens = ContainsTypeTokens();
             if (assignTokens || typeTokens)
-                return Assignment(assignTokens, typeTokens);
+                return Assignment(typeTokens);
 
             return Expr();
         }
@@ -56,14 +61,7 @@ namespace InterpreterProject
 
         private Token CurrentToken() => tokens[currentPos];
 
-        private IExprTree Expr()
-        {
-            IExprTree indexable = Or();
-
-            return indexable;
-        }
-
-
+        private IExprTree Expr() => Or();
 
         private IExprTree Or() => BinaryOperation(Xor, TokenType.Or);
 
@@ -98,7 +96,7 @@ namespace InterpreterProject
                     while (CurrentToken().Type == TokenType.LeftBracket)
                     {
                         Consume(TokenType.LeftBracket);
-                        indexable = new Indexer(indexable, Expr());
+                        indexable = new Indexer(indexable, Expr(), PreviousToken().Line);
                         Consume(TokenType.RightBracket);
                     }
                 return indexable;
@@ -115,18 +113,18 @@ namespace InterpreterProject
                 while (CurrentToken().Type == TokenType.LeftBracket)
                 {
                     Consume(TokenType.LeftBracket);
-                    indexable = new Indexer(indexable, Expr());
+                    indexable = new Indexer(indexable, Expr(), PreviousToken().Line);
                     Consume(TokenType.RightBracket);
                 }
 
                 return indexable;
             }
             else if (CurrentToken().Type == TokenType.RightParenthesy)
-                throw new Exception();
+                throw new UnmatchedBracketException(CurrentToken().Line);
 
             if (CurrentToken().Type == TokenType.LeftBracket)
             {
-                List<IExprTree> elements = new List<IExprTree>();
+                List<IExprTree> elements;
                 Consume(TokenType.LeftBracket);
                 elements = Array();
                 Consume(TokenType.RightBracket);
@@ -136,7 +134,7 @@ namespace InterpreterProject
                 while (CurrentToken().Type == TokenType.LeftBracket)
                 {
                     Consume(TokenType.LeftBracket);
-                    indexable = new Indexer(indexable, Expr());
+                    indexable = new Indexer(indexable, Expr(), PreviousToken().Line);
                     Consume(TokenType.RightBracket);
                 }
 
@@ -145,8 +143,6 @@ namespace InterpreterProject
 
             return null;
         }
-
-
 
         private IExprTree BinaryOperation(Func<IExprTree> ex, params TokenType[] args) 
         {
@@ -166,7 +162,7 @@ namespace InterpreterProject
 
         private ArrowType Var(bool expectIdentifier)
         {
-            ArrowType type = null;
+            ArrowType type;
             if (new[] { TokenType.N, TokenType.B, TokenType.LeftBracket, TokenType.LeftParenthesy }.Contains(CurrentToken().Type))
             {
                 switch (CurrentToken().Type)
@@ -183,7 +179,7 @@ namespace InterpreterProject
                         Consume(TokenType.RightBracket);
                         break;
                     case TokenType.LeftParenthesy:
-                        List<ArrowType> parameters = new List<ArrowType>();
+                        List<ArrowType> parameters = new();
                         Consume(TokenType.LeftParenthesy);
             
                         parameters.Add(Var(true));
@@ -218,9 +214,9 @@ namespace InterpreterProject
             else throw new Exception();    
         }
 
-        private IExprTree Assignment(bool assignTokens, bool typeTokens)
+        private IExprTree Assignment(bool typeTokens)
         {
-            ArrowType var = new ArrowType();
+            ArrowType var = new();
             if (typeTokens)
                 var = Var(true);
 
@@ -235,13 +231,12 @@ namespace InterpreterProject
                 case TokenType.Assign:
                     Consume(TokenType.Assign);
                     expr = Expr();
-                    if (expr == null) throw new Exception("Expected expression");
-
+                    if (expr == null) throw new ExpectedExpressionException(PreviousToken().Line);
 
                     if (typeTokens)
-                        return new Assignment(var, expr);
+                        return new Assignment(var, expr, PreviousToken().Line);
                     else
-                        return new Reassignment(id, expr, TokenType.Assign);
+                        return new Reassignment(id, expr, TokenType.Assign, PreviousToken().Line);
                 case TokenType.OrEquals:
                 case TokenType.AndEquals:
                 case TokenType.XorEquals:
@@ -253,20 +248,20 @@ namespace InterpreterProject
                     Consume(CurrentToken().Type);
                     TokenType type = PreviousToken().Type;
                     expr = Expr();
-                    if (expr == null) throw new Exception("Expected expression");
+                    if (expr == null) throw new ExpectedExpressionException(PreviousToken().Line);
 
                     if (typeTokens)
-                        throw new Exception($"Cannot apply {type} to a variable with no value");
+                        throw new UninitiallizedVariableException(PreviousToken().Type, PreviousToken().Line);
                     else
-                        return new Reassignment(id, expr, type);
+                        return new Reassignment(id, expr, type, PreviousToken().Line);
                 default:
-                    return new Assignment(var, null);
+                    return new Assignment(var, null, PreviousToken().Line);
             }
         }
 
         private List<IExprTree> Array()
         {
-            List<IExprTree> elements = new List<IExprTree>();
+            List<IExprTree> elements = new();
                 
             IExprTree tree = Expr();
             if (tree == null)
@@ -307,12 +302,6 @@ namespace InterpreterProject
                 i++;
             }
             return false;
-        }
-
-        private void OutputList<T>(List<T> list)
-        {
-            foreach (T t in list)
-                Console.WriteLine(t);
         }
     }
 }

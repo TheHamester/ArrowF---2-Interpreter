@@ -1,5 +1,5 @@
 ﻿
-namespace InterpreterProject.Expressions
+namespace InterpreterProject.ArrowExpressions
 {
     public interface IExprVisitor
     {
@@ -9,7 +9,6 @@ namespace InterpreterProject.Expressions
         object Visit(Unary unary);
         object Visit(Assignment assignment);
         object Visit(Reassignment assignment);
-        object Visit(Statement statement);
         object Visit(ArrowApplication arrowApplication);
         object Visit(ArrayExpression arrayExpression);
         object Visit(Indexer arrayExpression);

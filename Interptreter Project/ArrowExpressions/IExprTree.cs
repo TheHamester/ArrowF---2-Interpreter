@@ -1,5 +1,5 @@
 ﻿
-namespace InterpreterProject.Expressions
+namespace InterpreterProject.ArrowExpressions
 {
     public interface IExprTree
     {
