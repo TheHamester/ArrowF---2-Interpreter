@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using InterpreterProject.ArrowExceptions;
 
 namespace InterpreterProject
@@ -160,9 +160,7 @@ namespace InterpreterProject
                         AddTokenAndAdvance(1, new Token(TokenType.GreaterThan, ">", currentLine));
                         break;
                     default:
-                        throw new SymbolNotRecognisedException(Input[currentPos], currentPos, currentLine);
-
-             
+                        throw new SymbolNotRecognisedException(Input[currentPos], currentPos, currentLine);      
                 }
             }
             tokens.Add(new Token(TokenType.EOF, "<EOF>", currentPos));

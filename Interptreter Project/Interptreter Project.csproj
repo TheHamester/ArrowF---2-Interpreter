@@ -50,6 +50,7 @@
     <Compile Include="ArrowExceptions\ExpectedExpressionException.cs" />
     <Compile Include="ArrowExceptions\InvalidIndexException.cs" />
     <Compile Include="ArrowExceptions\UnableToModifyAConstantVariableException.cs" />
+    <Compile Include="ArrowExceptions\UnexpectedIndentLevelException.cs" />
     <Compile Include="ArrowExceptions\UnexpectedTokenException.cs" />
     <Compile Include="ArrowExceptions\UnindexableTypeException.cs" />
     <Compile Include="ArrowExceptions\UninitiallizedVariableException.cs" />
@@ -57,10 +58,11 @@
     <Compile Include="ArrowExceptions\UnmatchedArrayTypeException.cs" />
     <Compile Include="ArrowExceptions\UnmatchedBracketsException.cs" />
     <Compile Include="ArrowExceptions\VariableReferencedBeforeAssignmentException.cs" />
+    <Compile Include="ArrowExpressions\IfExpression.cs" />
     <Compile Include="ArrowInterpreter.cs" />
     <Compile Include="ArrowParser.cs" />
     <Compile Include="ArrowExpressions\ArrayExpression.cs" />
-    <Compile Include="ArrowExpressions\ArrowApplication.cs" />
+    <Compile Include="ArrowExpressions\CodeBlock.cs" />
     <Compile Include="ArrowTypes\ArrowArray.cs" />
     <Compile Include="ArrowTypes\ArrowBoolean.cs" />
     <Compile Include="ArrowTypes\ArrowFunction.cs" />

@@ -8,7 +8,7 @@ namespace InterpreterProject.ArrowExceptions
 {
     public class UninitiallizedVariableException : ArrowException
     {
-        public readonly TokenType Type;
+        public TokenType Type { get; }
 
         public UninitiallizedVariableException(TokenType type, int line) : base(line, $"Cannot apply operation {type} to an unitialized variable") 
         {

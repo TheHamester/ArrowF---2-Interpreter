@@ -8,7 +8,7 @@ namespace InterpreterProject.ArrowExceptions
 {
     internal class UnmatchedArrayDepthException : ArrowException
     {
-        public readonly int Depth;
+        public int Depth { get; }
 
         public UnmatchedArrayDepthException(int depth, int line) : base(line, $"Not all outer arrays have depth {depth}") 
         {

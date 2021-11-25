@@ -4,7 +4,7 @@ namespace InterpreterProject.ArrowExceptions
 {
     public class VariableReferencedBeforeAssignmentException : ArrowException
     {
-        public readonly string Id;
+        public string Id { get; }
         public VariableReferencedBeforeAssignmentException(string id, int line) : base(line, $"Variable {id} was referenced before assignment") 
         {
             Id = id;

@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using InterpreterProject.ArrowExpressions;
-using InterpreterProject.ArrowExceptions;
+using System.Collections.Generic;
 using InterpreterProject.ArrowTypes;
+using InterpreterProject.ArrowExceptions;
+using InterpreterProject.ArrowExpressions;
 
 namespace InterpreterProject
 {
@@ -31,19 +31,31 @@ namespace InterpreterProject
 
         public object Interpret(IExprTree tree)
         {
-            foreach (IExprTree expr in ((ArrowApplication)tree).Statements)
+            foreach (IExprTree expr in ((CodeBlock)tree).Statements)
             {
                 if (expr is Assignment assignment)
                     Evaluate(assignment);
                 else if (expr is Reassignment reassignment)
                     Evaluate(reassignment);
+                else if (expr is IfStatement ifStatement)
+                    Evaluate(ifStatement);
                 else
                     Console.WriteLine(Evaluate(expr));
             }
             return null;
         }
 
-        public object Visit(ArrowApplication arrowApplication) => null;
+        public object Visit(CodeBlock codeBlock) 
+        {
+            foreach (IExprTree expr in codeBlock.Statements)
+            {
+                object eval = Evaluate(expr);
+                if(eval != null)
+                    Console.WriteLine(eval);
+            }
+
+            return null;
+        }
 
         public object Evaluate(IExprTree expr) => expr.Accept(this);
 
@@ -117,8 +129,8 @@ namespace InterpreterProject
         {
             object left = Evaluate(binary.Left);
             object right = Evaluate(binary.Right);
-            object result;
 
+            object result;
             ArrowType type = new();
             int topLayer = 0;
             switch (binary.Token.Type)
@@ -378,7 +390,7 @@ namespace InterpreterProject
         public object Visit(Reassignment reassignment)
         {
             object result = Evaluate(reassignment.Right);
-            
+            bool success = true;
             int varIndex = variables.IndexOf(variables.First(v => v.Id == reassignment.Id));
             if (varIndex == -1)
                 throw new VariableReferencedBeforeAssignmentException(reassignment.Id, reassignment.Line);
@@ -392,65 +404,93 @@ namespace InterpreterProject
                     else if (variables[varIndex] is ArrowBoolean && result is bool resultBoolAssign)
                         variables[varIndex].Value = resultBoolAssign;
                     else if (variables[varIndex] is ArrowArray && result is List<object> resultArrayAssign)
-                    { 
+                    {
                         ArrowType t = new();
                         int topLayer = GetDepthAndType((ArrowArray)variables[varIndex], ref t);
 
-                        MatchesTypeAndDepth((List<object>)result, t, topLayer, topLayer, reassignment.Line);
+                        MatchesTypeAndDepth(resultArrayAssign, t, topLayer, topLayer, reassignment.Line);
                         variables[varIndex].Value = resultArrayAssign;
                     }
+                    else
+                        success = false;
                     break;
                 case TokenType.OrEquals:
                     if (variables[varIndex] is ArrowNote && result is ushort resultNoteOr)
                         variables[varIndex].Value = (ushort)((ushort)variables[varIndex].Value | resultNoteOr);
+                    else
+                        success = false;
                     break;
                 case TokenType.AndEquals:
                     if (variables[varIndex] is ArrowNote && result is ushort resultNoteAnd)
                         variables[varIndex].Value = (ushort)((ushort)variables[varIndex].Value & resultNoteAnd);
+                    else
+                        success = false;
                     break;
                 case TokenType.XorEquals:
                     if (variables[varIndex] is ArrowNote && result is ushort resultNoteXor)
                         variables[varIndex].Value = (ushort)((ushort)variables[varIndex].Value ^ resultNoteXor);
+                    else
+                        success = false;
                     break;
                 case TokenType.PlusEquals:
                     if (variables[varIndex] is ArrowNote && result is ushort resultNotePlus)
                         variables[varIndex].Value = (ushort)((ushort)variables[varIndex].Value + resultNotePlus);
+                    else
+                        success = false;
                     break;
                 case TokenType.MinusEquals:
                     if (variables[varIndex] is ArrowNote && result is ushort resultNoteMinus)
                         variables[varIndex].Value = (ushort)((ushort)variables[varIndex].Value - resultNoteMinus);
+                    else
+                        success = false;
                     break;
                 case TokenType.TimesEquals:
                     if (variables[varIndex] is ArrowNote && result is ushort resultNoteTimes)
                         variables[varIndex].Value = (ushort)((ushort)variables[varIndex].Value * resultNoteTimes);
+                    else
+                        success = false;
                     break;
                 case TokenType.DivideEquals:
                     if (variables[varIndex] is ArrowNote && result is ushort resultNoteDivide)
                         variables[varIndex].Value = (ushort)((ushort)variables[varIndex].Value / resultNoteDivide);
+                    else
+                        success = false;
                     break;
 
             }
-            throw new AssignmentTypeMismatchException(reassignment.Id, result.GetType().ToString(), variables[varIndex].GetType().ToString(), reassignment.Line);
+            if(!success)
+                throw new AssignmentTypeMismatchException(reassignment.Id, result.GetType().ToString(), variables[varIndex].GetType().ToString(), reassignment.Line);
+            return null;
         }
 
         public object Visit(Indexer indexer)
         {
-            object index = Evaluate(indexer.Expr);
+            object ind = Evaluate(indexer.Expr);
 
-            if (index is ushort ind)
+            if (ind is ushort index)
             {
 
                 object indexable = Evaluate(indexer.Indexable);
 
                 if (indexable is List<object> indexableArray)
-                    return indexableArray[ind];
+                    return indexableArray[index];
                 else if (indexable is ArrowArray indexableArrowArray)
-                    return ((List<object>)indexableArrowArray.Value)[ind];
+                    return ((List<object>)indexableArrowArray.Value)[index];
                 else
                     throw new UnindexableTypeException(indexable.GetType().ToString(), indexer.Line);
             }
             else
-                throw new InvalidIndexException(index.GetType().ToString(), indexer.Line);
+                throw new InvalidIndexException(ind.GetType().ToString(), indexer.Line);
+        }
+
+        public object Visit(IfStatement ifStatement) 
+        {
+            object condition = Evaluate(ifStatement.Condition);
+            if (condition is bool cond)
+                if (cond)
+                    return Evaluate(ifStatement.Block);
+
+            return null;
         }
 
         private int GetDepthAndType(ArrowArray arrowArray, ref ArrowType type)

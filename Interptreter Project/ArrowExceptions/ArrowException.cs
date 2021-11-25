@@ -8,7 +8,7 @@ namespace InterpreterProject.ArrowExceptions
 {
     public class ArrowException : Exception
     {
-        public readonly int Line;
+        public int Line { get; }
 
         public ArrowException(int line, string message) : base($"{message} on line {line}") 
         {

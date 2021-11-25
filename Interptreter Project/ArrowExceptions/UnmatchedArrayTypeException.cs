@@ -8,8 +8,8 @@ namespace InterpreterProject.ArrowExceptions
 {
     internal class UnmatchedArrayTypeException : ArrowException
     {
-        public readonly string Type1;
-        public readonly string Type2;
+        public string Type1 { get; }
+        public string Type2 { get; }
 
         public UnmatchedArrayTypeException(string type1, string type2, int line) : base(line, $"Cannot have an element of type {type1} in an array of type {type2}") 
         {

@@ -8,9 +8,9 @@ namespace InterpreterProject.ArrowExceptions
 {
     internal class AssignmentTypeMismatchException : ArrowException
     {
-        public readonly string Id;
-        public readonly string Type1;
-        public readonly string Type2;
+        public string Id { get; }
+        public string Type1 { get; }
+        public string Type2 { get; }
 
         public AssignmentTypeMismatchException(string id, string type1, string type2, int line) : base(line, $"Cannot assign value of type {type1} to variable \"{id}\" of type {type2}") 
         {

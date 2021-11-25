@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using InterpreterProject.ArrowExpressions;
+using System.Collections.Generic;
 using InterpreterProject.ArrowTypes;
 using InterpreterProject.ArrowExceptions;
+using InterpreterProject.ArrowExpressions;
 
 namespace InterpreterProject
 {
@@ -11,48 +11,93 @@ namespace InterpreterProject
     {
         private readonly List<Token> tokens = new();
         private int currentPos;
-
+        private bool checkEOL = true;
         public ArrowParser(List<Token> tokens) { this.tokens = tokens; }
 
         public IExprTree Parse()
         {
             currentPos = 0;
-            IExprTree tree = ArrowAppllication();
+            IExprTree tree = ArrowAppllication(0);
 
             return tree;
         }
         
         public void Consume(TokenType type)
         {
+            
             if (CurrentToken().Type != type)
                 throw new UnexpectedTokenException(CurrentToken().Type, type, CurrentToken().Line);
-
+            //Console.WriteLine()
             currentPos++;
         }
 
-        private IExprTree ArrowAppllication()
+        private IExprTree ArrowAppllication(int indentLevel)
+        {
+            return new CodeBlock(CodeBlock(indentLevel));
+        }
+
+        private List<IExprTree> CodeBlock(int indentLevel) 
         {
             List<IExprTree> statements = new();
+
+            int indLvl;
             while (CurrentToken().Type != TokenType.EOF)
             {
+                indLvl = 0;
+                int ind = currentPos;
+                while (tokens[ind].Type == TokenType.Tab)
+                {
+                    indLvl++;
+                    ind++;
+                }
+
+                //Console.WriteLine(indentLevel + " " + indLvl);
+
+                if (indLvl < indentLevel)
+                {
+                    checkEOL = false;
+                    break;
+                }
+                else if (indLvl > indentLevel)
+                    throw new UnexpectedIndentLevelException(PreviousToken().Line);
+
+                for (int i = 0; i < indLvl; i++)
+                    Consume(TokenType.Tab);
+
                 if (CurrentToken().Type == TokenType.EOL || CurrentToken().Type == TokenType.Comment)
                 {
                     Consume(TokenType.EOL);
                     continue;
                 }
-                statements.Add(Statement());
-                if(CurrentToken().Type != TokenType.EOF)
+
+                statements.Add(Statement(indentLevel));
+
+                if (CurrentToken().Type != TokenType.EOF && checkEOL)
+                {
                     Consume(TokenType.EOL);
+                }
+                else
+                    checkEOL = true;
+
             }
-            return new ArrowApplication(statements);
+            return statements;
         }
 
-        public IExprTree Statement()
+        public IExprTree Statement(int indentLevel)
         {
             bool assignTokens = ContainsAssignTokens();
             bool typeTokens = ContainsTypeTokens();
             if (assignTokens || typeTokens)
                 return Assignment(typeTokens);
+            else if (CurrentToken().Type == TokenType.If) 
+            {
+                Consume(TokenType.If);
+                IExprTree cond = Expr();
+                Consume(TokenType.EOL);
+                List<IExprTree> block = CodeBlock(indentLevel + 1);
+
+                return new IfStatement(cond, new CodeBlock(block));
+            }
 
             return Expr();
         }

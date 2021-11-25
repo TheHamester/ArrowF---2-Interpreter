@@ -8,9 +8,10 @@ namespace InterpreterProject.ArrowExpressions
         object Visit(Grouping grouping);
         object Visit(Unary unary);
         object Visit(Assignment assignment);
-        object Visit(Reassignment assignment);
-        object Visit(ArrowApplication arrowApplication);
+        object Visit(Reassignment reassignment);
+        object Visit(CodeBlock arrowApplication);
         object Visit(ArrayExpression arrayExpression);
-        object Visit(Indexer arrayExpression);
+        object Visit(Indexer indexer);
+        object Visit(IfStatement ifStatement);
     }
 }

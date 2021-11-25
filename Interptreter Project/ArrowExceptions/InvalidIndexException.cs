@@ -8,7 +8,7 @@ namespace InterpreterProject.ArrowExceptions
 {
     internal class InvalidIndexException : ArrowException
     {
-        public readonly string Type;
+        public string Type { get; }
 
         public InvalidIndexException(string type, int line) : base(line, $"Unable to use {type} as index for an array") 
         {
