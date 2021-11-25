@@ -85,18 +85,30 @@ namespace InterpreterProject
 
         public IExprTree Statement(int indentLevel)
         {
+            IExprTree cond;
             bool assignTokens = ContainsAssignTokens();
             bool typeTokens = ContainsTypeTokens();
-            if (assignTokens || typeTokens)
+            bool keywords = ContainsKeywords();
+            if ((assignTokens || typeTokens) && !keywords)
                 return Assignment(typeTokens);
-            else if (CurrentToken().Type == TokenType.If) 
+            else if (CurrentToken().Type == TokenType.If)
             {
                 Consume(TokenType.If);
-                IExprTree cond = Expr();
+                cond = assignTokens ? Assignment(typeTokens) : Expr();
+
                 Consume(TokenType.EOL);
                 List<IExprTree> block = CodeBlock(indentLevel + 1);
 
                 return new IfStatement(cond, new CodeBlock(block));
+            }
+            else if (CurrentToken().Type == TokenType.While) 
+            {
+                Consume(TokenType.While);
+                cond = assignTokens ? Assignment(typeTokens) : Expr();
+                Consume(TokenType.EOL);
+                List<IExprTree> block = CodeBlock(indentLevel + 1);
+
+                return new WhileStatement(cond, new CodeBlock(block));
             }
 
             return Expr();
@@ -290,6 +302,8 @@ namespace InterpreterProject
                 case TokenType.ModuloEquals:
                 case TokenType.DivideEquals:
                 case TokenType.TimesEquals:
+                case TokenType.LeftShiftEquals:
+                case TokenType.RightShiftEquals:
                     Consume(CurrentToken().Type);
                     TokenType type = PreviousToken().Type;
                     expr = Expr();
@@ -342,7 +356,19 @@ namespace InterpreterProject
                 if (new[] { TokenType.OrEquals,
                     TokenType.AndEquals, TokenType.XorEquals, TokenType.TimesEquals,
                     TokenType.DivideEquals, TokenType.PlusEquals, TokenType.MinusEquals,
-                    TokenType.ModuloEquals, TokenType.Assign}.Contains(tokens[i].Type))
+                    TokenType.ModuloEquals, TokenType.Assign, TokenType.LeftShiftEquals, TokenType.RightShiftEquals }.Contains(tokens[i].Type))
+                    return true;
+                i++;
+            }
+            return false;
+        }
+
+        private bool ContainsKeywords() 
+        {
+            int i = currentPos;
+            while (tokens[i].Type != TokenType.EOL && tokens[i].Type != TokenType.EOF)
+            {
+                if (new[] { TokenType.If, TokenType.While}.Contains(tokens[i].Type))
                     return true;
                 i++;
             }

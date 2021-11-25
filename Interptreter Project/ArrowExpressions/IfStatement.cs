@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace InterpreterProject.ArrowExpressions
 {
-    public record IfStatement(IExprTree Condition, CodeBlock Block) : IExprTree
+    public record IfStatement(IExprTree Condition, CodeBlock Body) : IExprTree
     {
         public object Accept(IExprVisitor visitor) => visitor.Visit(this);
     }

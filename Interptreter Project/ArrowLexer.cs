@@ -141,6 +141,11 @@ namespace InterpreterProject
                         }
                         else if (currentPos + 1 < Input.Length && Input[currentPos + 1] == '<')
                         {
+                            if (currentPos + 2 < Input.Length && Input[currentPos + 2] == '=')
+                            {
+                                AddTokenAndAdvance(3, new Token(TokenType.LeftShiftEquals, "<<=", currentLine));
+                                continue;
+                            }
                             AddTokenAndAdvance(2, new Token(TokenType.LeftShift, "<<", currentLine));
                             continue;
                         }
@@ -154,6 +159,11 @@ namespace InterpreterProject
                         }
                         else if (currentPos + 1 < Input.Length && Input[currentPos + 1] == '>')
                         {
+                            if (currentPos + 2 < Input.Length && Input[currentPos + 2] == '=')
+                            {
+                                AddTokenAndAdvance(3, new Token(TokenType.RightShiftEquals, ">>=", currentLine));
+                                continue;
+                            }
                             AddTokenAndAdvance(2, new Token(TokenType.RightShift, ">>", currentLine));
                             continue;
                         }

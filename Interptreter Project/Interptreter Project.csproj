@@ -58,7 +58,8 @@
     <Compile Include="ArrowExceptions\UnmatchedArrayTypeException.cs" />
     <Compile Include="ArrowExceptions\UnmatchedBracketsException.cs" />
     <Compile Include="ArrowExceptions\VariableReferencedBeforeAssignmentException.cs" />
-    <Compile Include="ArrowExpressions\IfExpression.cs" />
+    <Compile Include="ArrowExpressions\IfStatement.cs" />
+    <Compile Include="ArrowExpressions\WhileStatement.cs" />
     <Compile Include="ArrowInterpreter.cs" />
     <Compile Include="ArrowParser.cs" />
     <Compile Include="ArrowExpressions\ArrayExpression.cs" />

@@ -13,5 +13,6 @@ namespace InterpreterProject.ArrowExpressions
         object Visit(ArrayExpression arrayExpression);
         object Visit(Indexer indexer);
         object Visit(IfStatement ifStatement);
+        object Visit(WhileStatement whileStatement);
     }
 }
